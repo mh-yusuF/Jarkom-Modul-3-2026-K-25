@@ -8,9 +8,24 @@
 
 ## Laporan
 
+1. Ketika Curtain menutup Shibuya, jalur komunikasi antar zona Jujutsu High terputus. Pulihkan konektivitas dasar dengan mengonfigurasi jichi: eth0 memperoleh WAN dari NAT, sedangkan eth1–eth4 menjadi gateway Network 1–4 sesuai tabel pemetaan. Aktifkan IPv4 forwarding dan source NAT, lalu tetapkan IP statis host infrastruktur sesuai tabel spesifikasi. Buktikan konektivitas setiap host ke gateway dan akses eksternal dari host yang relevan.
 
+![Nama Alt Text](assets/1_setup.png)
+![Nama Alt Text](assets/1_config_client_static.png)
+![Nama Alt Text](assets/1_ping.png)
 
+Bisa dilihat bahwa konfigurasi jaringan pada node utahime menggunakan IP statis 10.76.1.2 dengan gateway 10.76.1.1.
+Selain itu, berdasarkan hasil uji ping ke 8.8.8.8, tercatat 0% packet loss, yang membuktikan bahwa routing, IPv4 forwarding, dan Source NAT (MASQUERADE) pada router utama telah berhasil dijalankan dan host sudah bisa mengakses internet.
 
+2. Tengen, penjaga pusat distribusi di Data Center, harus mengambil alih pengalokasian alamat bagi wilayah yang membutuhkan konfigurasi dinamis. Konfigurasikan isc-dhcp-server pada [PREFIX IP].4.10. Deklarasikan Network 4 ([PREFIX IP].4.0/24) sebagai subnet lokal tanpa pool dinamis, lalu siapkan scope DHCP untuk Network 2 ([PREFIX IP].2.0/24) dan Network 3 ([PREFIX IP].3.0/24). Validasi konfigurasi dan pastikan service aktif tanpa error “No subnet declaration”.
+
+![Nama Alt Text](assets/2_dhcp_running.png)
+![Nama Alt Text](assets/2_bukti.png)
+
+Bisa dilihat dari isi file /etc/dhcp/dhpd.conf dan status eksekusi layanan pada node tengen:   
+- Subnet Lokal Network 4 (10.76.4.0/24): Dideklarasikan secara kosong (subnet 10.76.4.0 netmask 255.255.255.0 {}) tanpa pool dinamis untuk menghindari error "No subnet declaration for eth0".
+- DHCP Scope Network 2 & Network 3: Dikonfigurasi dengan range IP, gateway (option routers), serta broadcast address sesuai spesifikasi subnet masing-masing.
+- Validasi Service: Layanan isc-dhcp-server berhasil di-restart dan berjalan aktif (running) serta mendengarkan pada port 67 (dhcpd listen port 67) tanpa error.   
 
 11. Utahime dan Shoko ditugaskan membangun sistem penamaan domain resmi agar seluruh pos tidak perlu menghafal alamat IP mentah. Konfigurasikan BIND9 pada utahime sebagai DNS Master dan shoko sebagai DNS Slave untuk mengelola domain jujutsu.<xxxx>.com. Atur SOA record, NS delegasi untuk kedua server, dan terapkan allow-transfer dari Master ke Slave. Pastikan file zona berhasil tersinkronisasi otomatis ke shoko saat nomor serial di utahime dinaikkan, lalu buktikan dengan melakukan query dig ke kedua server dari salah satu client.
 
