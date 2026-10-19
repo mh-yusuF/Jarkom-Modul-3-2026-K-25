@@ -37,7 +37,29 @@ Bisa dilihat dari hasil eksekusi script dan perintah client pada gambar:
 - Konfigurasi DHCP Relay: Layanan isc-dhcp-relay berhasil diinstal dan diaktifkan pada router jichi untuk meneruskan request DHCP dari Network 2 (eth2) dan Network 3 (eth3) menuju DHCP Server tengen (10.76.4.10) melalui eth4.
 - Pengujian Client Network 2 (itadori): Menjalankan udhcpc -i eth0 dan berhasil mendapatkan alokasi IP 10.76.2.11 dari DHCP Server 10.76.4.10.
 - Pengujian Client Network 3 (ino): Menjalankan udhcpc -i eth0 dan berhasil mendapatkan alokasi IP 10.76.3.11 dari DHCP Server 10.76.4.10.
-Hal ini membuktikan bahwa DHCP Relay pada router jichi telah berfungsi dengan baik dalam menyeberangkan permintaan IP antar-subnet.   
+Hal ini membuktikan bahwa DHCP Relay pada router jichi telah berfungsi dengan baik dalam menyeberangkan permintaan IP antar-subnet.
+
+4. Agar tim Dev dan Support di Divisi A menerima jatah alamat yang berbeda, atur dua pool DHCP pada Network 2. Tetapkan Pool 1 ([PREFIX IP].2.10–[PREFIX IP].2.35) untuk itadori dan fushiguro, serta Pool 2 ([PREFIX IP].2.70–[PREFIX IP].2.95) untuk zenin dan okkotsu. Rentang [PREFIX IP].2.36–[PREFIX IP].2.69 tidak boleh dialokasikan. Karena seluruh client berada pada subnet yang sama, gunakan DHCP class berdasarkan MAC Address atau Client ID untuk memisahkan kedua kelompok.
+### Pengecekan MAC Address Client
+![MAC Fushiguro](assets/4_mac_fushiguro.png)
+![MAC Itadori](assets/4_mac_itadori.png)
+![MAC Zenin](assets/4_mac_zenin.png)
+![MAC Okkutsu](assets/4_mac_okkutsu.png)
+### Validasi Script dan Konfigurasi DHCP Server
+![Script Konfigurasi DHCP](assets/4_script.png)
+
+### Alamat Lease Host Network 2 (Pool 1)
+![Lease Fushiguro](assets/4_lease_fushiguro.png)
+![Lease Itadori](assets/4_lease_itadori.png)
+
+### Alamat Lease Host Network 2 (Pool 2)
+![Lease Zenin](assets/4_zenin.png)
+![Lease Okkutsu](assets/4_okkutsu.png)
+
+Bisa dilihat bahwa konfigurasi DHCP server pada node tengen telah berhasil diterapkan menggunakan script validasi:  
+- Pool 1 (10.76.2.10 – 10.76.2.35): Dialokasikan untuk host fushiguro (10.76.2.10) dan itadori (10.76.2.11) berdasarkan pengelompokan kelas MAC Address/Client ID masing-masing.
+- Pool 2 (10.76.2.70 – 10.76.2.95): Dialokasikan untuk host zenin (10.76.2.70) dan okkotsu (10.76.2.71) berdasarkan MAC Address kelompok kedua.
+- Rentang Kosong (10.76.2.36 – 10.76.2.69): Dibiarkan tidak dialokasikan sesuai dengan ketentuan soal.
 
 11. Utahime dan Shoko ditugaskan membangun sistem penamaan domain resmi agar seluruh pos tidak perlu menghafal alamat IP mentah. Konfigurasikan BIND9 pada utahime sebagai DNS Master dan shoko sebagai DNS Slave untuk mengelola domain jujutsu.<xxxx>.com. Atur SOA record, NS delegasi untuk kedua server, dan terapkan allow-transfer dari Master ke Slave. Pastikan file zona berhasil tersinkronisasi otomatis ke shoko saat nomor serial di utahime dinaikkan, lalu buktikan dengan melakukan query dig ke kedua server dari salah satu client.
 
