@@ -61,6 +61,25 @@ Bisa dilihat bahwa konfigurasi DHCP server pada node tengen telah berhasil diter
 - Pool 2 (10.76.2.70 – 10.76.2.95): Dialokasikan untuk host zenin (10.76.2.70) dan okkotsu (10.76.2.71) berdasarkan MAC Address kelompok kedua.
 - Rentang Kosong (10.76.2.36 – 10.76.2.69): Dibiarkan tidak dialokasikan sesuai dengan ketentuan soal.
 
+5. Setiap tim lapangan memiliki durasi operasi yang berbeda. Pada Network 3, berikan short lease 30 menit (1800 detik) kepada ino dan kusakabe, serta long lease 12 jam (43200 detik) kepada miwa. Gunakan pool short lease [PREFIX IP].3.10–[PREFIX IP].3.89 dan pool long lease [PREFIX IP].3.100–[PREFIX IP].3.199. Sesuaikan default-lease-time dan max-lease-time untuk setiap kelas client. Berikan pula DHCP options berupa DNS [PREFIX IP].1.2 dan [PREFIX IP].1.3, serta domain-search <xxxx>.com.
+### Pengecekan MAC Address Client
+![MAC Ino](assets/5_mac_ino.png)
+![MAC Kusakabe](assets/5_mac_kusakabe.png)
+![MAC Miwa](assets/5_mac_miwa.png)
+
+### Validasi Script dan Konfigurasi DHCP Server
+![Script Konfigurasi Soal 5](assets/5_script.png)
+
+### Alamat Lease dan Lease Time Client Network 3
+![Lease Ino](assets/5_udhcp_ino.png)
+![Lease Kusakabe](assets/5_udhcp_kusakabe.png)
+![Lease Miwa](assets/5_udhcp_miwa.png)
+
+Bisa dilihat dari hasil eksekusi script di tengen dan pengujian client di Network 3:   
+- Short Lease (Pool 10.76.3.10 – 10.76.3.89):Dialokasikan untuk host ino (10.76.3.11) dan kusakabe (10.76.3.10) berdasarkan pencocokan MAC Address.   Mendapatkan lease time sekitar 1800 detik (30 menit).
+- Long Lease (Pool 10.76.3.100 – 10.76.3.199):Dialokasikan untuk host miwa (10.76.3.100) berdasarkan MAC Address-nya.   Mendapatkan lease time sekitar 43200 detik (12 jam).
+- DHCP Options: Masing-masing client menerima opsi DNS Server (10.76.1.2, 10.76.1.3) dan pencarian domain.
+
 11. Utahime dan Shoko ditugaskan membangun sistem penamaan domain resmi agar seluruh pos tidak perlu menghafal alamat IP mentah. Konfigurasikan BIND9 pada utahime sebagai DNS Master dan shoko sebagai DNS Slave untuk mengelola domain jujutsu.<xxxx>.com. Atur SOA record, NS delegasi untuk kedua server, dan terapkan allow-transfer dari Master ke Slave. Pastikan file zona berhasil tersinkronisasi otomatis ke shoko saat nomor serial di utahime dinaikkan, lalu buktikan dengan melakukan query dig ke kedua server dari salah satu client.
 
 ### Pendahuluan
