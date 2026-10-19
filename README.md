@@ -27,6 +27,18 @@ Bisa dilihat dari isi file /etc/dhcp/dhpd.conf dan status eksekusi layanan pada 
 - DHCP Scope Network 2 & Network 3: Dikonfigurasi dengan range IP, gateway (option routers), serta broadcast address sesuai spesifikasi subnet masing-masing.
 - Validasi Service: Layanan isc-dhcp-server berhasil di-restart dan berjalan aktif (running) serta mendengarkan pada port 67 (dhcpd listen port 67) tanpa error.   
 
+3. Permintaan alamat dari Divisi A dan Divisi B tidak dapat menyeberangi subnet secara langsung. Konfigurasikan jichi sebagai DHCP Relay menuju tengen ([PREFIX IP].4.10), menggunakan eth2 untuk Network 2 dan eth3 untuk Network 3. Buktikan bahwa client dari kedua subnet berhasil memperoleh lease melalui relay.
+
+![Nama Alt Text](assets/3_script.png)
+![Nama Alt Text](assets/3_itadori.png)
+![Nama Alt Text](assets/3_ino.png)
+
+Bisa dilihat dari hasil eksekusi script dan perintah client pada gambar:
+- Konfigurasi DHCP Relay: Layanan isc-dhcp-relay berhasil diinstal dan diaktifkan pada router jichi untuk meneruskan request DHCP dari Network 2 (eth2) dan Network 3 (eth3) menuju DHCP Server tengen (10.76.4.10) melalui eth4.
+- Pengujian Client Network 2 (itadori): Menjalankan udhcpc -i eth0 dan berhasil mendapatkan alokasi IP 10.76.2.11 dari DHCP Server 10.76.4.10.
+- Pengujian Client Network 3 (ino): Menjalankan udhcpc -i eth0 dan berhasil mendapatkan alokasi IP 10.76.3.11 dari DHCP Server 10.76.4.10.
+Hal ini membuktikan bahwa DHCP Relay pada router jichi telah berfungsi dengan baik dalam menyeberangkan permintaan IP antar-subnet.   
+
 11. Utahime dan Shoko ditugaskan membangun sistem penamaan domain resmi agar seluruh pos tidak perlu menghafal alamat IP mentah. Konfigurasikan BIND9 pada utahime sebagai DNS Master dan shoko sebagai DNS Slave untuk mengelola domain jujutsu.<xxxx>.com. Atur SOA record, NS delegasi untuk kedua server, dan terapkan allow-transfer dari Master ke Slave. Pastikan file zona berhasil tersinkronisasi otomatis ke shoko saat nomor serial di utahime dinaikkan, lalu buktikan dengan melakukan query dig ke kedua server dari salah satu client.
 
 ### Pendahuluan
