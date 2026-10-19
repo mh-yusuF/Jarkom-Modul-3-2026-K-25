@@ -80,6 +80,21 @@ Bisa dilihat dari hasil eksekusi script di tengen dan pengujian client di Networ
 - Long Lease (Pool 10.76.3.100 – 10.76.3.199):Dialokasikan untuk host miwa (10.76.3.100) berdasarkan MAC Address-nya.   Mendapatkan lease time sekitar 43200 detik (12 jam).
 - DHCP Options: Masing-masing client menerima opsi DNS Server (10.76.1.2, 10.76.1.3) dan pencarian domain.
 
+6. Kugisaki ditetapkan sebagai personel VIP yang harus mempertahankan alamat yang sama setiap kali terhubung. Buat DHCP static lease berdasarkan MAC Address client tersebut dengan fixed address [PREFIX IP].3.99. Pastikan alamat ini berada di luar seluruh pool dinamis, validasi konfigurasi server, lalu renew lease pada client. Buktikan bahwa alamat yang diterima sesuai dengan reservasi.
+### Validasi Konfigurasi DHCP Server
+![Validasi DHCP](assets/6_bukti_1.png)
+
+### Konfigurasi Fixed Address Host Kugisaki
+![Konfigurasi Host Kugisaki](assets/6_bukti_2.png)
+
+### Hasil Renew Lease pada Client Kugisaki
+![Lease Kugisaki](assets/6_kugisaki_lease.png)
+
+Bisa dilihat dari konfigurasi server dan hasil pengujian client pada gambar:
+- Reservasi IP Statis: Pada file /etc/dhcp/dhcpd.conf node tengen, dibuat blok host kugisaki yang mendaftarkan MAC Address 02:42:af:be:32:00 dengan fixed-address 10.76.3.99 (di luar pool dinamis).
+- Validasi Server: Konfigurasi divalidasi dengan dhcpd -t -cf /etc/dhcp/dhcpd.conf dan terbukti bebas error syntax.
+- Pengujian Client: Saat kugisaki menjalankan udhcpc -i eth0, client berhasil memperoleh IP reservasi 10.76.3.99 dari DHCP Server 10.76.4.10.
+
 11. Utahime dan Shoko ditugaskan membangun sistem penamaan domain resmi agar seluruh pos tidak perlu menghafal alamat IP mentah. Konfigurasikan BIND9 pada utahime sebagai DNS Master dan shoko sebagai DNS Slave untuk mengelola domain jujutsu.<xxxx>.com. Atur SOA record, NS delegasi untuk kedua server, dan terapkan allow-transfer dari Master ke Slave. Pastikan file zona berhasil tersinkronisasi otomatis ke shoko saat nomor serial di utahime dinaikkan, lalu buktikan dengan melakukan query dig ke kedua server dari salah satu client.
 
 ### Pendahuluan
