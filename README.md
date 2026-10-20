@@ -95,6 +95,23 @@ Bisa dilihat dari konfigurasi server dan hasil pengujian client pada gambar:
 - Validasi Server: Konfigurasi divalidasi dengan dhcpd -t -cf /etc/dhcp/dhcpd.conf dan terbukti bebas error syntax.
 - Pengujian Client: Saat kugisaki menjalankan udhcpc -i eth0, client berhasil memperoleh IP reservasi 10.76.3.99 dari DHCP Server 10.76.4.10.
 
+7. Setelah aturan alokasi diterapkan, pastikan setiap client menerima konfigurasi jaringan sesuai wilayahnya: subnet mask 255.255.255.0 (/24), gateway dan broadcast address yang benar, DNS [PREFIX IP].1.2 serta [PREFIX IP].1.3, dan domain-search yang ditentukan. Periksa IP address dan routing seluruh client Divisi A dan Divisi B, kemudian cocokkan lease dengan /var/lib/dhcp/dhcpd.leases pada tengen. Pastikan tidak ada alamat yang bertabrakan atau berada di luar kebijakan pool.
+
+### Validasi Konfigurasi IP, Gateway, dan DNS pada salah satu Client
+![Validasi Client](assets/7_client.png)
+
+### Pencocokan Lease DHCP dan Pemeriksaan Bentrok IP di Server Tengen
+![Validasi Tengen 1](assets/7_tengen_1.png)
+![Validasi Tengen 2](assets/7_tengen_2.png)
+
+Bisa dilihat dari hasil eksekusi script validasi pada client dan server tengen: - Validasi Client: Host (seperti okkotsu) menerima konfigurasi jaringan yang sesuai meliputi subnet mask /24, gateway, broadcast, DNS Server (10.76.1.2, 10.76.1.3), serta domain-search K25.com.   
+- Pencocokan Lease: Berdasarkan pemeriksaan /var/lib/dhcp/dhcpd.leases dan reservasi dhcpd.conf, seluruh client (itadori, fushiguro, zenin, okkotsu, kusakabe, ino, kugisaki, miwa) mendapatkan IP yang sesuai dengan kebijakan pool dan reservasi masing-masing.
+- Pemeriksaan Bentrok: Sistem memastikan bahwa tidak ada IP yang bertabrakan, tidak ada duplikasi MAC Address, serta tidak ada alokasi pada rentang terlarang (10.76.2.36–69).
+
+8. Sebelum Curtain dibuka kembali, buktikan bahwa proses pemberian alamat berjalan sesuai protokol. Lakukan packet capture saat salah satu client Network 2 atau Network 3 meminta lease baru. Gunakan tcpdump pada tengen atau jalur menuju Data Center untuk menunjukkan urutan DHCPDISCOVER → DHCPOFFER → DHCPREQUEST → DHCPACK. Identifikasi alamat server, alamat yang diberikan, lease time, dan field giaddr. Pastikan nilai giaddr sesuai dengan interface jichi yang menerima request dari subnet client.
+
+
+
 11. Utahime dan Shoko ditugaskan membangun sistem penamaan domain resmi agar seluruh pos tidak perlu menghafal alamat IP mentah. Konfigurasikan BIND9 pada utahime sebagai DNS Master dan shoko sebagai DNS Slave untuk mengelola domain jujutsu.<xxxx>.com. Atur SOA record, NS delegasi untuk kedua server, dan terapkan allow-transfer dari Master ke Slave. Pastikan file zona berhasil tersinkronisasi otomatis ke shoko saat nomor serial di utahime dinaikkan, lalu buktikan dengan melakukan query dig ke kedua server dari salah satu client.
 
 ### Pendahuluan
